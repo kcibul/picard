@@ -45,14 +45,45 @@ import java.util.TreeSet;
  * @author Tim Fennell
  */
 @CommandLineProgramProperties(
-        usage = "Collects a set of Hybrid Selection specific metrics from an aligned SAM" +
-                "or BAM file. If a reference sequence is provided, AT/GC dropout metrics will " +
-                "be calculated, and the PER_TARGET_COVERAGE option can be used to output GC and " +
-                "mean coverage information for every target.",
-        usageShort = "Collects Hybrid Selection-specific metrics for a SAM or BAM file",
+        usage = CollectHsMetrics.USAGE_SUMMARY + CollectHsMetrics.USAGE_DETAILS,
+        usageShort = CollectHsMetrics.USAGE_SUMMARY,
         programGroup = Metrics.class
 )
 public class CollectHsMetrics extends CollectTargetedMetrics<HsMetrics, HsMetricCollector> {
+        static final String USAGE_SUMMARY = "Collects hybrid-selection (HS) specific metrics for a SAM or BAM file.  ";
+        static final String USAGE_DETAILS = "<p>These metrics enable users to determine the efficacy and quality of hybrid selection (HS) experiments.</p>  " +
+                "" +
+                "<p>Hybrid selection enables users to target and sequence specific regions of a genome.  It is commonly used to characterize exon sequences" +
+                " from genomic DNA or filter out contaminating bacterial DNA sequences from clinical samples.  For additional information " +
+                "and the theory behind this technique, please see the following GATK " +
+                "<a href=\"http://www.broadinstitute.org/gatk/guide/article?id=6331\">Dictionary</a> entry.</p>" +
+                "" +
+                "<p>This tool requires an aligned SAM or BAM file as well as bait and target interval files.  These interval files can be created from BED files using Picard's " +
+                "<a href=\"http://broadinstitute.github.io/picard/command-line-overview.html#BedToIntervalList\">BedToInterval</a> tool.</p>" +
+                "" +
+                "If a reference sequence is provided, this program will calculate both AT_DROPOUT and GC_DROPOUT metrics.  These \"dropout\" " +
+                "metrics are an attempt to measure the reduced representation of reads, which contain sequences that deviate from 50% G/C content.  " +
+                "This reduction in the number of aligned reads is due to the increased numbers of errors associated with sequencing " +
+                "regions of excessive or deficient numbers of G/C bases, ultimately leading to poor mapping efficiencies." +
+                "" +
+                "<p>The PER_TARGET_COVERAGE option can be invoked to output G/C content and mean sequence depth information for every target interval." +
+                "</p>" +
+                "" +
+                "<p>Please note that coverage measurements are capped at ~32K to constrain memory usage."+
+
+                "<h4>Usage Example:</h4>"+
+                "<pre>" +
+                "java -jar picard.jar CollectHsMetrics \\<br />" +
+                "      I=input.bam \\<br />" +
+                "      O=hs_metrics.txt \\<br />" +
+                "      R=reference_sequence.fasta \\<br />" +
+                "      BAIT_INTERVALS=bait.interval_list \\<br />" +
+                "      TARGET_INTERVALS=target.interval_list" +
+                "</pre> "   +
+                "<p>Please see the CollectTargetedMetrics " +
+                "<a href=\"http://broadinstitute.github.io/picard/picard-metric-definitions.html#HsMetrics\">definitions</a> for a " +
+                "complete description of the metrics produced by this tool.</p> "+
+                "<hr />";
 
     @Option(shortName = "BI", doc = "An interval list file that contains the locations of the baits used.", minElements=1)
     public List<File> BAIT_INTERVALS;

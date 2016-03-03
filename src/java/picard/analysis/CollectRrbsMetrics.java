@@ -63,26 +63,23 @@ import java.util.Set;
         programGroup = Metrics.class
 )
 public class CollectRrbsMetrics extends CommandLineProgram {
-    static final String USAGE_SUMMARY = "Collect metrics from reduced representation bisulfite sequencing (RRBS) data.  ";
-    static final String USAGE_DETAILS = "This tool collect metrics for RRBS data, based on the methylation status of cytosine (C) " +
-            "bases in both CpG and non-CpG sites across all reads of a BAM/SAM file. For a brief primer on bisulfite sequencing and " +
-            "cytosine methylation, see the " +
-            "<a href='https://www.broadinstitute.org/gatk/guide/article?id=6330'>GATK Dictionary</a>." +
-            "<br /><br />" +
+    static final String USAGE_SUMMARY = "Collects metrics from reduced representation bisulfite sequencing (RRBS) data.  ";
+    static final String USAGE_DETAILS = "<p>Data collected is based on the methylation status of cytosine (C) " +
+            "bases in both CpG  \"hotspots\" and non-CpG sites across all reads of a BAM/SAM file. For a brief primer on bisulfite sequencing and " +
+            "cytosine methylation, please see our GATK " +
+            "<a href='https://www.broadinstitute.org/gatk/guide/article?id=6330'><b>Dictionary</b></a> entry.</p>" +
             "" +
-            "Since cytosine methylation is not exclusive for CpG \"hotspots\", the CollectRrbsMetrics tool outputs a summary table " +
-            "indicating the number of CpG and non-CpG cytosines as well as their conversion C -> T (+ strand) or G -> A (- strand) " +
-            "rates. The tool also outputs the numbers of reads having no CpG sites, and the numbers of reads discarded from the " +
-            "analysis due to inadequate size or excessive numbers of mismatches." +
-            "<br /><br />" +
-            "The tool also provides a table containing detailed information on CpG occurrence frequency, CpG conversion frequencies " +
-            "[C -> T (+ strand) or G -> A (- strand)], and the specific locations of the CpG sites in the genome. The conversion " +
-            "frequency helps determines the methylation status of a CpG site." +
-            "<br /><br />" +
-            "Finally, the tool provides graphical representation of four metrics in the form of a \".pdf\" document. These metrics " +
-            "are the bisulfite conversion rate for CpG and non-CpG cytosines, a distribution of the numbers of CpG sites as a " +
-            "function of CpG conversion rate, the distribution of CpG sites by read coverage, and the numbers of reads discarded due " +
-            "to high numbers of mismatches or inadequate read size." +
+            "<p>This tool outputs a DetailMetrics table on CpG \"hotspots\" and their conversion [C -> T (+ strand) or G -> A (- strand)] frequencies.  " +
+            "This conversion frequency is used to determine the methylation status of CpG sites.</p>" +
+            "" +
+            "<p>However, since cytosine methylation is not exclusive for CpG \"hotspots\", the CollectRrbsMetrics tool also outputs a SummaryMetrics table " +
+            "indicating both the number of CpG and non-CpG cytosines as well as the respective conversion frequencies.  " +
+            "The tool also outputs the numbers of reads having no CpG sites, and the numbers of reads discarded from the " +
+            "analysis due to inadequate size or excessive numbers of mismatches.</p>" +
+            "" +
+            "<p>Finally, the tool outputs graphs representing the following four metrics: the bisulfite conversion rate for CpG and non-CpG cytosines, " +
+            "a distribution of the numbers of CpG sites as a function of CpG conversion rate, the distribution of CpG sites by read coverage (depth)," +
+            " and the numbers of reads discarded due to high numbers of mismatches or inadequate read size.</p>" +
             "" +
             "<h4>Usage example:</h4>" +
             "<pre>" +
@@ -91,13 +88,12 @@ public class CollectRrbsMetrics extends CommandLineProgram {
             "      M=rrbs_metrics \\<br />" +
             "      R=reference_sequence.fasta" +
             "</pre>" +
-            "<hr />" +
             "" +
-            "Please see " +
+            "<p>For detailed explanations of the output metrics please see the following sites describing "+
             "<a href='https://broadinstitute.github.io/picard/picard-metric-definitions.html#RrbsCpgDetailMetrics'>" +
-            "the RrbsCpgDetailMetrics documentation</a> and the " +
+            "<b>RrbsCpgDetailMetrics</b></a> and the " +
             "<a href='https://broadinstitute.github.io/picard/picard-metric-definitions.html#RrbsSummaryMetrics'>" +
-            "the RrbsSummaryMetrics documentation</a>for detailed explanations of the output metrics." +
+            "<b>RrbsSummaryMetrics</b></a>.</p>" +
             "<hr />";
 
 // Path to R file for plotting purposes

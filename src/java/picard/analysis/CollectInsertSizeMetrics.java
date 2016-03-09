@@ -159,26 +159,26 @@ public class CollectInsertSizeMetrics extends SinglePassSamProgram {
         else  {
             file.write(OUTPUT);
 
-            final int rResult;
-            if(HISTOGRAM_WIDTH == null) {
-                rResult = RExecutor.executeFromClasspath(
-                    Histogram_R_SCRIPT,
-                    OUTPUT.getAbsolutePath(),
-                    Histogram_FILE.getAbsolutePath(),
-                    INPUT.getName());
-            } else {
-                rResult = RExecutor.executeFromClasspath(
-                    Histogram_R_SCRIPT,
-                    OUTPUT.getAbsolutePath(),
-                    Histogram_FILE.getAbsolutePath(),
-                    INPUT.getName(),
-                    String.valueOf(HISTOGRAM_WIDTH) ); //Histogram_WIDTH is passed because R automatically sets Histogram width to the last
-                                                         //bin that has data, which may be less than Histogram_WIDTH and confuse the user.
-            }
-
-            if (rResult != 0) {
-                throw new PicardException("R script " + Histogram_R_SCRIPT + " failed with return code " + rResult);
-            }
+//            final int rResult;
+//            if(HISTOGRAM_WIDTH == null) {
+//                rResult = RExecutor.executeFromClasspath(
+//                    Histogram_R_SCRIPT,
+//                    OUTPUT.getAbsolutePath(),
+//                    Histogram_FILE.getAbsolutePath(),
+//                    INPUT.getName());
+//            } else {
+//                rResult = RExecutor.executeFromClasspath(
+//                    Histogram_R_SCRIPT,
+//                    OUTPUT.getAbsolutePath(),
+//                    Histogram_FILE.getAbsolutePath(),
+//                    INPUT.getName(),
+//                    String.valueOf(HISTOGRAM_WIDTH) ); //Histogram_WIDTH is passed because R automatically sets Histogram width to the last
+//                                                         //bin that has data, which may be less than Histogram_WIDTH and confuse the user.
+//            }
+//
+//            if (rResult != 0) {
+//                throw new PicardException("R script " + Histogram_R_SCRIPT + " failed with return code " + rResult);
+//            }
         }
     }
 }

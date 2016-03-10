@@ -126,11 +126,11 @@ public class CollectInsertSizeMetricsTest extends CommandLineProgramTest {
                 Assert.assertEquals(metrics.WIDTH_OF_30_PERCENT, 5);
                 Assert.assertEquals(metrics.WIDTH_OF_40_PERCENT, 5);
                 Assert.assertEquals(metrics.WIDTH_OF_50_PERCENT, 5);
-                Assert.assertEquals(metrics.WIDTH_OF_60_PERCENT, 0);
-                Assert.assertEquals(metrics.WIDTH_OF_70_PERCENT, 0);
-                Assert.assertEquals(metrics.WIDTH_OF_80_PERCENT, 0);
-                Assert.assertEquals(metrics.WIDTH_OF_90_PERCENT, 0);
-                Assert.assertEquals(metrics.WIDTH_OF_99_PERCENT, 0);
+                Assert.assertEquals(metrics.WIDTH_OF_60_PERCENT, 7);
+                Assert.assertEquals(metrics.WIDTH_OF_70_PERCENT, 7);
+                Assert.assertEquals(metrics.WIDTH_OF_80_PERCENT, 7);
+                Assert.assertEquals(metrics.WIDTH_OF_90_PERCENT, 7);
+                Assert.assertEquals(metrics.WIDTH_OF_99_PERCENT, 7);
             }
             else if (metrics.READ_GROUP.equals("62A79AAXX100907.7")) {
                 Assert.assertEquals((int)metrics.MEDIAN_INSERT_SIZE, 37);

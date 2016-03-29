@@ -34,6 +34,15 @@ public class ClassifyCrisper extends CommandLineProgram {
     @Option(doc = "minimum base quality score to consider for a mismatch/mutation")
     public Integer MIN_BASE_QUAL = 20;
 
+    @Option(doc = "contig of target")
+    public String TARGET_CONTIG;
+
+    @Option(doc = "start position of target (1-base, inclusive)" )
+    public Integer TARGET_START;
+
+    @Option(doc = "end position of target (1-base, inclusive)" )
+    public Integer TARGET_END;
+
     @Option(doc = "only consider this read name, for debugging", optional = true)
     public String DEBUG_READ_NAME;
 
@@ -81,27 +90,19 @@ public class ClassifyCrisper extends CommandLineProgram {
                 rec.setMappingQuality(0);
             }
 
-            // TODO: parameterize location
-            // TODO: parameterize offset
-            // TODO: also use reads that end at the amplicon end (look at HWI:1:X:1:2112:14750:7013)
-            String contig = "11";
-            int position = 67017759;
+            int targetLength = TARGET_END - TARGET_START + 1;
 
-            // need to calculate relative to start position
-            int offset = 36;
-            int length = 23;
             String type;
 
-            if (rec.getContig() != null && rec.getContig().equals(contig) && rec.getAlignmentStart() == position) {
+            // check that the target region is completely within the read
+            if (rec.getContig() != null && rec.getContig().equals(TARGET_CONTIG) && rec.getAlignmentStart() <= TARGET_START && rec.getAlignmentEnd() >= TARGET_END) {
 
-                int start = rec.getReadPositionAtReferencePosition(position + offset);
-                int end = rec.getReadPositionAtReferencePosition(position + offset + length);
+                int start = rec.getReadPositionAtReferencePosition(TARGET_START);
+                int end = rec.getReadPositionAtReferencePosition(TARGET_END);
 
-                int targetStart = position + offset;
-                int targetEnd = targetStart + length - 1;
-
-                int currentPosition = position;
-                int indelLength = 0;
+                int currentPosition = rec.getAlignmentStart();
+                int insertedBases = 0;
+                int deletedBases = 0;
 
                 for (CigarElement ce : rec.getCigar().getCigarElements()) {
                     if (ce.getOperator() == CigarOperator.HARD_CLIP | ce.getOperator() == CigarOperator.SOFT_CLIP) {
@@ -113,43 +114,34 @@ public class ClassifyCrisper extends CommandLineProgram {
                     }
 
                     if (ce.getOperator() == CigarOperator.INSERTION) {
-                        if (currentPosition > targetStart) {
-                            indelLength = ce.getLength();
-                            break;
-                        }
+                        insertedBases += ce.getLength();
+                        // don't increment position
                     }
 
                     if (ce.getOperator() == CigarOperator.DELETION) {
-                        currentPosition += ce.getLength();
-
-                        // see if the deletion includes some of our target
-                        if (currentPosition > targetStart) {
-                            indelLength = ce.getLength();
-                            break;
-                        }
-
-                        // add the deleted bases
+                        deletedBases += ce.getLength();
                         currentPosition += ce.getLength();
                     }
 
-                    if (currentPosition > targetEnd) {
-                        break;
-                    }
                 }
 
-                // we didnt' make it through the targeted region
-                if (currentPosition <= targetEnd && indelLength == 0) {
-                    type = "no-overlap";
-                } else if (indelLength == 0) {
+                // we didn't make it through the targeted region
+                if (currentPosition <= TARGET_END && insertedBases + deletedBases == 0) {
+                    type = "no-overlap"; // would be strange...
+                } else if (insertedBases == 0 && deletedBases == 0) {
 
                     if (start >= 0 && end >= start) {
 
-                        String bases = rec.getReadString().substring(start, end);
-                        byte[] quals = Arrays.copyOfRange(rec.getBaseQualities(), start, end);
+                        String bases = rec.getReadString().substring(start, end+1);  // substring is end exclusive
+                        byte[] quals = Arrays.copyOfRange(rec.getBaseQualities(), start, end+1);  // copyOfRange is end exclusive
 
                         int mutatedBases = 0;
                         int noisyBases = 0;
-                        for (int i = 0; i < length; i++) {
+
+                        if (bases.length() < targetLength) {
+                            System.out.println("Error!");
+                        }
+                        for (int i = 0; i < targetLength; i++) {
                             if ('=' != bases.charAt(i)) {
                                 if (quals[i] > MIN_BASE_QUAL) {
                                     mutatedBases++;
@@ -169,7 +161,7 @@ public class ClassifyCrisper extends CommandLineProgram {
                     } else {
                         type = "clipped";
                     }
-                } else if (indelLength % 3 == 0) {
+                } else if (insertedBases - deletedBases % 3 == 0) {
                     type = "in-frame";
                 } else {
                     type = "frame-shift";
@@ -177,7 +169,12 @@ public class ClassifyCrisper extends CommandLineProgram {
 
 
             } else {
-                type = "off-target";
+                // if we are within 250bp, call it 'near-target'
+                if (rec.getContig() != null && rec.getContig().equals(TARGET_CONTIG) && rec.getAlignmentStart()-250 <= TARGET_START && rec.getAlignmentEnd()+250 >= TARGET_END) {
+                    type = "near-target";
+                } else {
+                    type = "off-target";
+                }
             }
 
             incrementSummaryCounts(type);

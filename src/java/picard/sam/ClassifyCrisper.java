@@ -130,10 +130,11 @@ public class ClassifyCrisper extends CommandLineProgram {
                     type = "no-overlap"; // would be strange...
                 } else if (insertedBases == 0 && deletedBases == 0) {
 
-                    if (start >= 0 && end >= start) {
+                    if (start >= 0 && end >= start ) {
 
-                        String bases = rec.getReadString().substring(start, end+1);  // substring is end exclusive
-                        byte[] quals = Arrays.copyOfRange(rec.getBaseQualities(), start, end+1);  // copyOfRange is end exclusive
+                        // start and end are 1-based, but we need them to be zero based here
+                        String bases = rec.getReadString().substring(start-1, end-1+1);  // substring is end exclusive
+                        byte[] quals = Arrays.copyOfRange(rec.getBaseQualities(), start-1, end-1+1);  // copyOfRange is end exclusive
 
                         int mutatedBases = 0;
                         int noisyBases = 0;
